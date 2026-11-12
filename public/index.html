@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QUESTORA – Challenge Your Mind. Earn Your Glory.</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0820;--bg2:#141046;--glass:rgba(255,255,255,.06);--line:rgba(160,140,255,.25);--tx:#f3f1ff;--mu:#a9a4d6;--vi:#8b5cf6;--cy:#22d3ee;--go:#fbbf24;--ok:#34d399;--sf:#f0abfc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="light"]{--bg:#f4f2ff;--bg2:#e4deff;--glass:rgba(255,255,255,.7);--line:rgba(90,70,200,.25);--tx:#1c1550;--mu:#5b5590}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4f2ff;--bg2:#e4deff;--glass:rgba(255,255,255,.7);--line:rgba(90,70,200,.25);--tx:#1c1550;--mu:#5b5590}}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;color:var(--tx);font:500 16px/1.5 Figtree,system-ui,sans-serif;background:radial-gradient(900px 600px at 80% -10%,var(--bg2),transparent),var(--bg);overflow-x:hidden}
+h1,h2,h3{font-family:'Bricolage Grotesque',system-ui,sans-serif;margin:0;letter-spacing:-.02em}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+#fx{position:fixed;inset:0;z-index:50;pointer-events:none}
+main{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:20px 16px 60px}
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(14px);padding:24px;box-shadow:0 20px 50px rgba(20,10,80,.25)}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--cy);outline-offset:2px}
+.btn{background:linear-gradient(135deg,var(--vi),#4f46e5);color:#fff;padding:13px 26px;border-radius:999px;font-weight:600;box-shadow:0 8px 24px rgba(139,92,246,.45);transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}.btn.ghost{background:var(--glass);border:1px solid var(--line);box-shadow:none}.btn:disabled{opacity:.4;cursor:not-allowed}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.logo{font:800 22px 'Bricolage Grotesque';display:flex;gap:10px;align-items:center;letter-spacing:.035em}.logo i{width:34px;height:34px;position:relative;display:inline-grid;place-items:center;flex:0 0 34px;border-radius:11px;background:conic-gradient(from 0deg,#22d3ee,#8b5cf6,#ec4899,#fbbf24,#22d3ee);box-shadow:0 0 18px rgba(139,92,246,.55);animation:logo-turn 8s linear infinite}.logo i::before{content:'Q';position:absolute;inset:3px;border-radius:8px;background:#100b2c;color:#fff;display:grid;place-items:center;font:800 21px 'Bricolage Grotesque';text-shadow:0 0 10px rgba(34,211,238,.8)}.logo i::after{content:'';position:absolute;width:43px;height:15px;border:1.5px solid rgba(34,211,238,.8);border-radius:50%;transform:rotate(-35deg);box-shadow:0 0 9px rgba(34,211,238,.5);animation:logo-orbit 4s ease-in-out infinite alternate;pointer-events:none}@keyframes logo-turn{to{filter:hue-rotate(360deg)}}@keyframes logo-orbit{to{transform:rotate(35deg) scale(.88)}}
+.view{display:none}.view.on{display:block;animation:in .45s ease}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero{text-align:center;padding:clamp(76px,11vh,126px) 0 24px}
+.hero h1{font-size:clamp(40px,9vw,88px);line-height:.95;background:linear-gradient(120deg,var(--tx) 30%,var(--go));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--mu);max-width:520px;margin:18px auto 28px;font-size:18px}
+.coinhero{width:92px;height:92px;margin:0 auto 18px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff3b0,var(--go) 45%,#b45309);box-shadow:0 0 60px rgba(251,191,36,.6);display:grid;place-items:center;font:800 40px 'Bricolage Grotesque';color:#7c4a03;animation:spin 5s linear infinite}
+@keyframes spin{0%{transform:rotateY(0)}100%{transform:rotateY(360deg)}}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+label{display:block;font-size:14px;color:var(--mu);margin:12px 0 6px}
+input{width:100%;padding:13px 16px;border-radius:14px;border:1px solid var(--line);background:var(--glass);color:var(--tx);font:inherit}
+.err{color:#fda4af;font-size:13px;min-height:18px}
+.stat b{display:block;font:800 30px 'Bricolage Grotesque'}.stat span{color:var(--mu);font-size:14px}
+.hud{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pill{background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:7px 15px;font-weight:600;display:inline-flex;gap:7px;align-items:center}
+.pill.gold{color:var(--go)}.pill.warn{color:#fb7185;animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(251,113,133,.25)}}
+.bar{height:8px;border-radius:9px;background:var(--glass);overflow:hidden;border:1px solid var(--line)}
+.bar>div{height:100%;background:linear-gradient(90deg,var(--vi),var(--cy));transition:width .5s}
+.q{font:700 clamp(20px,3.4vw,28px)/1.3 'Bricolage Grotesque';margin:14px 0 20px}
+.tag{color:var(--cy);font-size:14px}
+.opt{display:flex;gap:14px;width:100%;text-align:left;padding:15px 18px;margin:10px 0;border-radius:16px;background:var(--glass);border:1.5px solid var(--line);transition:.15s}
+.opt:hover:not(:disabled){border-color:var(--vi);transform:translateX(4px)}
+.opt b{width:30px;height:30px;border-radius:9px;background:var(--line);display:grid;place-items:center;flex:none}
+.opt.right{border-color:var(--ok);background:rgba(52,211,153,.15)}.opt.wrong{border-color:var(--sf);background:rgba(240,171,252,.12)}
+.msg{min-height:26px;font-weight:600;margin:6px 0}
+.nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px}
+.nav button{width:36px;height:36px;border-radius:10px;background:var(--glass);border:1px solid var(--line)}
+.nav .done{background:var(--vi);color:#fff}.nav .cur{outline:2px solid var(--go)}
+.row{display:flex;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap}
+.trophy{font-size:72px;text-align:center;filter:drop-shadow(0 0 24px rgba(251,191,36,.7))}
+.big{font:800 clamp(56px,14vw,110px)/1 'Bricolage Grotesque';text-align:center;color:var(--go)}
+.badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.badge{padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,rgba(251,191,36,.25),rgba(139,92,246,.25));border:1px solid var(--go);animation:in .6s both}
+.sub{display:grid;grid-template-columns:130px 1fr 44px;gap:10px;align-items:center;margin:8px 0}
+.lb{width:100%;border-collapse:collapse}.lb td,.lb th{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line)}.lb tr.me{background:rgba(251,191,36,.15)}
+.wrapx{overflow-x:auto}
+.toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top,0px));transform:translate(-50%,-140%);z-index:60;transition:.4s;background:linear-gradient(135deg,var(--go),#f59e0b);color:#3b2400;padding:12px 22px;border-radius:999px;font-weight:700;box-shadow:0 10px 40px rgba(251,191,36,.5)}
+.toast.on{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:560px){.sub{grid-template-columns:100px 1fr 38px}}
+.stat{transition:transform .15s;transform-style:preserve-3d}
+canvas#gl{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100vh;
+  z-index:0;
+  pointer-events:none;
+}
+body::before{content:"";position:fixed;inset:-20%;z-index:0;background:radial-gradient(40% 40% at 20% 30%,rgba(236,72,153,.35),transparent),radial-gradient(40% 40% at 80% 20%,rgba(34,211,238,.3),transparent),radial-gradient(45% 45% at 60% 90%,rgba(139,92,246,.4),transparent);animation:aur 18s ease-in-out infinite alternate}
+@keyframes aur{to{transform:translate(4%,-3%) rotate(8deg) scale(1.1)}}
+@keyframes flow{to{background-position:300% 0}}
+.hero h1{background:linear-gradient(110deg,#f472b6,#a78bfa,#22d3ee,#fbbf24,#f472b6);background-size:300% 100%;animation:flow 8s linear infinite;-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{background:linear-gradient(110deg,#ec4899,#8b5cf6,#22d3ee,#ec4899);background-size:250% 100%;animation:flow 6s linear infinite}
+.btn.ghost{animation:none}
+.coinhero{background:none;box-shadow:none;height:196px;width:100%;margin:0 auto 22px;animation:none;color:transparent}
+.opt:nth-child(1) b{background:#ec4899;color:#fff}.opt:nth-child(2) b{background:#0891b2;color:#fff}.opt:nth-child(3) b{background:#f59e0b;color:#3b2400}.opt:nth-child(4) b{background:#10b981;color:#042f1e}
+.glass{border-image:none;box-shadow:0 20px 50px rgba(20,10,80,.25),inset 0 0 0 1px rgba(255,255,255,.04)}
+.hero{perspective:800px}
+.hero h1{background:none;animation:none;color:inherit;-webkit-background-clip:border-box;background-clip:border-box}
+.hero h1 span{display:inline-block;background:linear-gradient(110deg,#f472b6,#a78bfa,#22d3ee,#fbbf24,#f472b6);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rise .9s cubic-bezier(.2,.9,.2,1) both,flow 8s linear infinite;filter:drop-shadow(0 0 18px rgba(139,92,246,.45))}
+@keyframes rise{from{opacity:0;transform:translateY(40px) scale(.8) rotateX(60deg);filter:blur(10px)}}
+@keyframes rise2{from{opacity:0;transform:translateY(16px)}}
+@keyframes ring{70%{box-shadow:0 0 0 18px rgba(236,72,153,0)}100%{box-shadow:0 0 0 0 rgba(236,72,153,0)}}
+.hero p{animation:rise2 1s .9s both}
+.hero .btn{font-size:18px;padding:16px 36px;box-shadow:0 0 0 0 rgba(236,72,153,.6);animation:flow 6s linear infinite,rise2 1s 1.2s both,ring 2.2s 2s infinite}
+
+/* Landing hero spacing, scroll cue and animated Questora mark. */
+.scroll-cue{display:flex;flex-direction:column;align-items:center;gap:5px;width:max-content;margin:clamp(28px,5vh,48px) auto 0;color:var(--mu);text-decoration:none;font-size:10px;font-weight:700;letter-spacing:.22em;opacity:.9}
+.scroll-cue i{font-style:normal;font-size:34px;line-height:1;color:#fff;text-shadow:0 0 12px rgba(34,211,238,.9),0 0 24px rgba(139,92,246,.8);animation:arrow-hop 1.15s ease-in-out infinite}
+@keyframes arrow-hop{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+.logo{position:relative;text-shadow:0 0 18px rgba(139,92,246,.22)}
+.logo:hover i{animation-duration:2s;transform:scale(1.08)}
+@media (prefers-reduced-motion:reduce){.logo i,.logo i::after,.scroll-cue i{animation:none!important}}
+
+/* Landing page additions: navigation, footer and responsive sizing.
+   Existing visual effects and Three.js animation are intentionally preserved. */
+html { scroll-behavior: smooth; }
+main { width: min(100%, 1120px); padding-left: clamp(14px, 3.5vw, 30px); padding-right: clamp(14px, 3.5vw, 30px); }
+.top { flex-wrap: nowrap; position: relative; z-index: 20; min-width: 0; }
+.logo { color: var(--tx); text-decoration: none; flex: 0 0 auto; }
+.top-right { display:flex; align-items:center; justify-content:flex-end; gap:14px; min-width:0; }
+.landing-nav { display:flex; align-items:center; justify-content:flex-end; gap:clamp(12px,2vw,24px); }
+.landing-nav a, .footer-links a, .footer-links button {
+  color:var(--mu); text-decoration:none; font:600 14px/1.2 Figtree,system-ui,sans-serif;
+  transition:color .2s ease, transform .2s ease;
+}
+.landing-nav a:hover, .footer-links a:hover, .footer-links button:hover { color:var(--tx); transform:translateY(-1px); }
+.nav-cta {
+  color:#fff; background:linear-gradient(110deg,#ec4899,#8b5cf6,#22d3ee);
+  border-radius:999px; padding:9px 17px; font:600 14px Figtree,system-ui,sans-serif;
+  box-shadow:0 8px 22px rgba(139,92,246,.25); transition:transform .2s ease;
+}
+.nav-cta:hover { transform:translateY(-2px); }
+.top-tools { display:flex; align-items:center; gap:8px; }
+.menu-toggle {
+  display:none; width:42px; height:42px; flex:0 0 auto; padding:9px;
+  border:1px solid var(--line); border-radius:13px; background:var(--glass);
+}
+.menu-toggle span { display:block; height:2px; width:100%; margin:5px 0; background:var(--tx); border-radius:3px; }
+#v-land { min-width:0; }
+#home, #features, #how-it-works { scroll-margin-top:22px; }
+.hero { padding-left:8px; padding-right:8px; }
+.hero h1 { font-size:clamp(36px,8vw,88px); overflow-wrap:normal; }
+.hero p { width:min(100%,520px); font-size:clamp(15px,2vw,18px); }
+.landing-features { margin-top:18px; }
+.landing-features > * { min-width:0; }
+.landing-note {
+  width:min(100%,780px); margin:clamp(30px,6vw,58px) auto 0; padding:clamp(22px,4vw,38px);
+  text-align:center; border:1px solid var(--line); border-radius:22px;
+  background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(34,211,238,.06));
+  backdrop-filter:blur(12px);
+}
+.note-kicker { display:block; color:var(--cy); font-size:11px; font-weight:700; letter-spacing:.16em; margin-bottom:9px; }
+.landing-note h2 { font-size:clamp(25px,4vw,36px); }
+.landing-note p { max-width:570px; margin:12px auto 20px; color:var(--mu); }
+.site-footer {
+  margin-top:clamp(38px,6vw,68px); padding:24px 2px 8px;
+  border-top:1px solid var(--line); display:grid; grid-template-columns:1fr auto;
+  gap:12px 22px; align-items:center;
+}
+.footer-brand { display:inline-flex; align-items:center; gap:9px; color:var(--tx); text-decoration:none; font:800 19px 'Bricolage Grotesque',system-ui,sans-serif; }
+.footer-brand i { width:19px; height:19px; border-radius:7px; background:conic-gradient(var(--go),var(--vi),var(--cy),var(--go)); }
+.footer-about p { margin:4px 0 0; color:var(--mu); font-size:13px; }
+.footer-links { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:14px 19px; }
+.footer-links button { padding:0; border:0; background:none; cursor:pointer; }
+.footer-copy { grid-column:1/-1; padding-top:9px; color:var(--mu); font-size:12px; opacity:.8; }
+@media (max-width:760px) {
+  .top-right { gap:9px; }
+  .landing-nav { gap:11px; }
+  .landing-nav a { font-size:13px; }
+  .top-tools .pill { padding:7px 10px; font-size:12px; }
+}
+@media (max-width:620px) {
+  .top { align-items:center; }
+  .top-tools { display:none; }
+  .student-authenticated .top-tools { display:flex; align-items:center; margin-left:auto; }
+  .student-authenticated .menu-toggle { display:none !important; }
+  .student-authenticated .top-tools #out { display:inline-flex !important; white-space:nowrap; }
+  .menu-toggle { display:block; }
+  .landing-nav {
+    display:none; position:absolute; top:calc(100% + 10px); right:0;
+    width:min(290px,calc(100vw - 28px)); padding:12px;
+    border:1px solid var(--line); border-radius:17px;
+    background:rgba(18,13,48,.97); box-shadow:0 18px 44px rgba(0,0,0,.35);
+    backdrop-filter:blur(18px); flex-direction:column; align-items:stretch; gap:0;
+  }
+  :root[data-theme="light"] .landing-nav { background:rgba(246,243,255,.98); }
+  .landing-nav.open { display:flex; }
+  .landing-nav a { padding:13px 10px; border-bottom:1px solid var(--line); font-size:14px; }
+  .landing-nav .nav-cta { margin-top:11px; }
+  .hero { padding-top:clamp(68px,12vh,104px); }
+  .hero h1 { font-size:clamp(34px,9.5vw,58px); line-height:1.02; }
+  .coinhero { height:clamp(150px,30vw,190px); margin-bottom:18px; }
+  .hero p { padding:0 5px; }
+  .hero .btn { margin:5px 3px !important; }
+  .grid { grid-template-columns:1fr; }
+  .landing-features .stat { padding:19px 20px; }
+  .site-footer { grid-template-columns:1fr; gap:14px; }
+  .footer-links { justify-content:flex-start; }
+  .footer-copy { grid-column:auto; }
+}
+@media (max-width:380px) {
+  main { padding-left:12px; padding-right:12px; }
+  .logo { font-size:19px; }
+  .hero h1 { font-size:clamp(31px,9vw,38px); }
+  .hero p { font-size:15px; }
+  .landing-note { padding:20px 15px; }
+  .footer-links { gap:12px 15px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  html { scroll-behavior:auto; }
+}
+
+
+/* Final landing-page layout polish: full-width header and visible scroll cue. */
+@media (min-width: 621px) {
+  main {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 18px 0 60px;
+  }
+  #site-header {
+    width: 100%;
+    padding: 0 clamp(24px, 4.8vw, 76px);
+    margin: 0 auto 10px;
+    min-height: 58px;
+  }
+  #v-land { width: 100%; }
+  #v-land > .hero,
+  #v-land > .landing-features,
+  #v-land > .landing-note,
+  #v-land > .site-footer {
+    width: min(100% - 48px, 1320px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .landing-nav { gap: clamp(22px, 2.3vw, 36px); }
+}
+#site-header { min-height: 58px; }
+.logo {
+  font-size: clamp(25px, 2vw, 30px);
+  gap: 12px;
+  letter-spacing: .045em;
+  text-shadow: 0 0 14px rgba(139,92,246,.28);
+}
+.logo i {
+  width: 43px;
+  height: 43px;
+  flex-basis: 43px;
+  border-radius: 13px;
+  box-shadow: 0 0 18px rgba(139,92,246,.55), 0 0 34px rgba(34,211,238,.2);
+}
+.logo i::before {
+  inset: 3px;
+  border-radius: 10px;
+  font-size: 27px;
+}
+.logo i::after { width: 52px; height: 19px; }
+.landing-nav { gap: clamp(18px, 2vw, 30px); }
+.landing-nav a,
+.footer-links a,
+.footer-links button {
+  font-size: clamp(15px, 1.15vw, 17px);
+  font-weight: 650;
+}
+.nav-cta {
+  padding: 12px 23px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.hero {
+  padding-top: clamp(42px, 6vh, 76px);
+  padding-bottom: 12px;
+}
+.coinhero {
+  height: clamp(138px, 19vh, 174px);
+  margin-bottom: 12px;
+}
+.hero h1 { font-size: clamp(42px, 7.2vw, 84px); }
+.hero p { margin-top: 16px; margin-bottom: 22px; }
+.hero .btn { font-size: 18px; padding: 15px 30px; }
+.scroll-cue {
+  margin-top: clamp(10px, 1.8vh, 20px);
+  gap: 2px;
+  font-size: 11px;
+  letter-spacing: .2em;
+}
+.scroll-cue i {
+  font-size: 42px;
+  animation: arrow-hop 1.05s ease-in-out infinite;
+}
+@keyframes arrow-hop {
+  0%,100% { transform: translateY(-2px); }
+  50% { transform: translateY(7px); }
+}
+/* Keep the assessment screens comfortably readable after widening the shell. */
+#v-login, #v-reg, #v-dash, #v-exam, #v-res {
+  width: min(100%, 1120px);
+  margin-left: auto;
+  margin-right: auto;
+}
+@media (max-width: 760px) {
+  main { width: 100%; max-width: none; padding: 14px 0 42px; }
+  #site-header { padding: 0 20px; }
+  .logo { font-size: 23px; }
+  .logo i { width: 39px; height: 39px; flex-basis: 39px; }
+  .logo i::before { font-size: 24px; }
+  .landing-nav a { font-size: 15px; }
+  .hero { padding-top: clamp(38px, 7vh, 62px); }
+  .coinhero { height: clamp(125px, 25vh, 165px); }
+  .scroll-cue { margin-top: 12px; }
+}
+@media (max-width: 620px) {
+  #site-header { padding: 0 16px; }
+  .landing-nav { gap: 0; }
+  .landing-nav a { font-size: 15px; }
+  .landing-nav .nav-cta { font-size: 15px; padding: 12px 18px; }
+  .hero { padding-top: 34px; }
+  .hero h1 { font-size: clamp(35px, 9vw, 54px); }
+  .coinhero { height: 132px; margin-bottom: 12px; }
+  .hero .btn { font-size: 16px; padding: 14px 22px; }
+  .scroll-cue { margin-top: 8px; }
+  .scroll-cue i { font-size: 38px; }
+}
+
+
+/* Fixed, full-width navigation bar */
+#site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  min-height: 76px;
+  margin: 0;
+  padding: 10px clamp(20px, 5vw, 80px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 24px;
+  z-index: 100;
+  /* At the top, keep the navbar visually transparent so the original page
+     gradient remains unchanged. Add only a subtle tint after scrolling. */
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  transition: background-color .28s ease, border-color .28s ease,
+              box-shadow .28s ease, backdrop-filter .28s ease;
+}
+#site-header.scrolled {
+  background: rgba(11, 8, 32, .48);
+  border-bottom-color: rgba(180, 160, 255, .16);
+  box-shadow: 0 8px 26px rgba(3, 4, 20, .12);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+main { padding-top: 94px !important; }
+#site-header .top-right { margin-left: auto; }
+#site-header .landing-nav { align-items: center; }
+#home, #features, #how-it-works { scroll-margin-top: 100px; }
+@media (max-width: 760px) {
+  #site-header { min-height: 68px; padding: 9px 20px; gap: 12px; }
+  main { padding-top: 84px !important; }
+  #home, #features, #how-it-works { scroll-margin-top: 84px; }
+}
+@media (max-width: 620px) {
+  #site-header { min-height: 64px; padding: 8px 16px; }
+  main { padding-top: 78px !important; }
+  #site-header .landing-nav { top: calc(100% + 8px); }
+  #home, #features, #how-it-works { scroll-margin-top: 78px; }
+}
+
+
+/* Sign-in keeps the same animated landing-page atmosphere and 3D sculpture. */
+body.auth-view canvas#gl { opacity: .88; visibility: visible; }
+body.auth-view canvas#bg { opacity: 1; }
+body.auth-view::before { opacity: 1; }
+body.auth-view .signin-shell {
+  background: linear-gradient(135deg,rgba(20,14,58,.66),rgba(8,7,29,.72));
+  border-color: rgba(160,140,255,.3);
+}
+body.auth-view .signin-card { background: rgba(10,8,34,.48); }
+body.auth-view .signin-welcome { background: linear-gradient(135deg,rgba(139,92,246,.10),rgba(10,8,34,.12)); }
+body.auth-view #v-login { animation: signin-arrive .72s cubic-bezier(.2,.85,.2,1) both; }
+@keyframes signin-arrive {
+  from { opacity:0; transform:translateY(24px) scale(.985); filter:blur(5px); }
+  to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+}
+body.auth-view main { min-height: calc(100vh - 94px); display:flex; flex-direction:column; justify-content:center; }
+#v-login { width:min(100%, 1080px); margin:24px auto 40px; }
+.signin-shell { display:grid; grid-template-columns:minmax(0,1fr) minmax(360px,.88fr); overflow:hidden; min-height:590px; border:1px solid rgba(160,140,255,.24); border-radius:30px; background:linear-gradient(135deg,rgba(26,19,70,.82),rgba(12,10,35,.88)); box-shadow:0 28px 90px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.08); backdrop-filter:blur(18px); }
+.signin-welcome { position:relative;animation:signin-welcome-arrive .8s both cubic-bezier(.2,.85,.2,1); padding:clamp(34px,5vw,68px); display:flex; flex-direction:column; justify-content:center; overflow:hidden; background:radial-gradient(circle at 18% 20%,rgba(236,72,153,.22),transparent 34%),radial-gradient(circle at 85% 80%,rgba(34,211,238,.16),transparent 38%),linear-gradient(145deg,rgba(139,92,246,.13),transparent 65%); }
+.signin-welcome::after { content:""; position:absolute; width:330px;height:330px;right:-155px;top:-150px;border:1px solid rgba(167,139,250,.2);border-radius:50%;box-shadow:0 0 0 28px rgba(167,139,250,.035),0 0 0 58px rgba(167,139,250,.025); }
+.signin-orbit { position:relative;width:104px;height:104px;margin-bottom:36px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(from 40deg,#22d3ee,#8b5cf6,#ec4899,#fbbf24,#22d3ee);box-shadow:0 0 42px rgba(139,92,246,.35);animation:signin-spin 14s linear infinite; }
+.signin-orbit::before { content:"";position:absolute;inset:5px;border-radius:50%;background:#100b2c; }
+.signin-orbit span { position:relative;z-index:1;font:800 54px 'Bricolage Grotesque';color:#fff;text-shadow:0 0 20px rgba(34,211,238,.7); }
+.signin-orbit i,.signin-orbit b { position:absolute;inset:-10px;border:1px solid rgba(34,211,238,.55);border-radius:50%;transform:rotateX(65deg) rotateZ(25deg); }
+.signin-orbit b { inset:-17px;border-color:rgba(236,72,153,.45);transform:rotateX(65deg) rotateZ(-35deg); }
+@keyframes signin-spin { to { filter:hue-rotate(360deg); } }
+@keyframes signin-welcome-arrive { from {opacity:0;transform:translateX(-22px)} to {opacity:1;transform:translateX(0)} }
+@keyframes signin-card-arrive { from {opacity:0;transform:translateX(22px)} to {opacity:1;transform:translateX(0)} }
+.signin-kicker { color:#67e8f9;font-size:11px;font-weight:800;letter-spacing:.22em; }
+.signin-welcome h1 { margin:14px 0 16px;font-size:clamp(38px,5vw,62px);line-height:1.02;letter-spacing:-.045em; }
+.signin-welcome h1 em { font-style:normal;background:linear-gradient(100deg,#f0abfc,#a78bfa,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent; }
+.signin-welcome>p { max-width:410px;color:#bcb6e3;font-size:16px;line-height:1.8;margin:0; }
+.signin-points { display:grid;gap:13px;margin-top:34px;color:#e7e2ff;font-size:14px; }
+.signin-points i { display:inline-grid;place-items:center;width:22px;height:22px;margin-right:9px;border-radius:7px;background:rgba(34,211,238,.12);color:#67e8f9;font-style:normal; }
+.signin-card { align-self:center;animation:signin-card-arrive .8s .12s both cubic-bezier(.2,.85,.2,1);margin:28px;padding:clamp(26px,4vw,48px);border:1px solid rgba(180,160,255,.2);border-radius:24px;background:rgba(255,255,255,.045);box-shadow:0 18px 55px rgba(0,0,0,.18); }
+.signin-card h2 { margin-top:10px;font-size:clamp(27px,3vw,36px); }
+.signin-intro { margin:8px 0 27px;color:var(--mu);font-size:14px; }
+.signin-card label { margin:18px 0 8px;color:#e5e0ff;font-weight:650;font-size:13px; }
+.signin-input-wrap { min-height:54px;display:flex;align-items:center;gap:11px;padding:0 14px;border:1px solid rgba(160,140,255,.28);border-radius:14px;background:rgba(7,6,25,.42);transition:border-color .2s,box-shadow .2s,transform .2s; }
+.signin-input-wrap:focus-within { border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.13);transform:translateY(-1px); }
+.signin-input-wrap>span { color:#9f8bfa;font-size:18px; }
+.signin-input-wrap input { min-width:0;flex:1;padding:14px 0;border:0;outline:0;background:transparent;box-shadow:none;font-size:14px;color:#fff; }
+.signin-input-wrap input:focus-visible { outline:0; }
+.signin-input-wrap input::placeholder { color:#817aa9; }
+.password-toggle { padding:6px 3px;background:transparent;color:#67e8f9;font-size:12px;font-weight:700; }
+.signin-meta { margin:11px 0 4px;color:#9992c2;font-size:11px; }
+.signin-card .err { min-height:22px;margin-top:5px; }
+.signin-submit { width:100%;display:flex;align-items:center;justify-content:center;gap:12px;margin-top:7px;padding:16px 22px;border-radius:14px;font-size:15px; }
+.signin-submit b { font-size:21px;transition:transform .2s; }
+.signin-submit:hover b { transform:translateX(5px); }
+.signin-register { margin:23px 0 0;text-align:center;color:var(--mu);font-size:13px; }
+.signin-register button { padding:0;background:none;color:#67e8f9;font-weight:750; }
+.signin-bottom { display:flex;align-items:center;gap:10px;margin-top:30px;color:#817aa9;font-size:9px;font-weight:800;letter-spacing:.16em;white-space:nowrap; }
+.signin-bottom span { height:1px;flex:1;background:rgba(160,140,255,.2); }
+@media(max-width:800px) { .signin-shell { grid-template-columns:1fr;min-height:0; } .signin-welcome { padding:30px 32px 26px; } .signin-orbit { width:72px;height:72px;margin-bottom:22px; } .signin-orbit span { font-size:38px; } .signin-welcome h1 { font-size:clamp(34px,7vw,48px); } .signin-points { grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:22px; } .signin-card { width:min(100% - 36px,520px);margin:0 auto 24px; } }
+@media(max-width:480px) { #v-login { margin:12px auto 28px; } .signin-shell { border-radius:22px; } .signin-welcome { padding:25px 23px 22px; } .signin-welcome>p { font-size:14px; } .signin-points { gap:9px;font-size:12px; } .signin-card { width:calc(100% - 24px);padding:25px 20px;margin-bottom:12px; } .signin-bottom { font-size:8px; } }
+:root[data-theme="light"] .signin-shell { background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(235,230,255,.96)); }
+:root[data-theme="light"] .signin-card { background:rgba(255,255,255,.72); }
+:root[data-theme="light"] .signin-card label { color:#33276d; }
+:root[data-theme="light"] .signin-input-wrap { background:rgba(245,242,255,.9); }
+:root[data-theme="light"] .signin-input-wrap input { color:#1c1550; }
+:root[data-theme="light"] .signin-welcome>p { color:#5b5590; }
+:root[data-theme="light"] .signin-points { color:#33276d; }
+
+
+/* Registration mirrors the sign-in experience; both fit naturally with a shared footer. */
+body.auth-view main { min-height:calc(100vh - 94px); justify-content:flex-start; }
+#v-login, #v-reg { width:min(100%,1120px); margin:12px auto 20px; }
+#v-login .signin-shell { min-height:clamp(500px,calc(100vh - 210px),590px); }
+#v-reg .register-shell { min-height:0; }
+.register-welcome { padding-top:34px; padding-bottom:34px; }
+.register-card { width:100%; max-width:620px; justify-self:center; margin:18px; padding:clamp(20px,2.4vw,30px); }
+.register-card h2 { margin-top:7px; }
+.register-card .signin-intro { margin-bottom:14px; }
+.register-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 14px; }
+.register-fields>div { min-width:0; }
+.register-card label { margin:10px 0 6px; }
+.register-card .signin-input-wrap { min-height:46px; gap:8px; padding:0 11px; }
+.register-card .signin-input-wrap input { padding:10px 0; font-size:13px; }
+.register-show { display:flex!important; align-items:center; gap:8px; margin:12px 0 5px!important; color:#e5e0ff!important; font-size:12px!important; }
+.register-show input { width:auto; accent-color:#8b5cf6; }
+.register-card .signin-submit { margin-top:3px; padding:13px 18px; }
+.register-card .signin-register { margin:14px 0 0; }
+.register-card .signin-bottom { margin-top:18px; }
+.auth-footer { display:none; width:min(100% - 48px,1120px); margin:8px auto 0; padding:14px 0 8px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:12px 20px; color:var(--mu); font-size:12px; }
+.auth-footer a { color:var(--tx); text-decoration:none; }
+.auth-footer .footer-links { gap:12px 18px; }
+.auth-footer .footer-links a,.auth-footer .footer-links button { font-size:12px; }
+body.auth-view main { padding-bottom:18px!important; }
+@media(max-width:800px) {
+  body.auth-view main { min-height:calc(100vh - 84px); }
+  #v-login .signin-shell { min-height:0; }
+  .register-card { max-width:680px; margin:0 auto 22px; width:calc(100% - 36px); }
+  .auth-footer { width:calc(100% - 36px); flex-wrap:wrap; }
+}
+@media(max-width:560px) {
+  .register-fields { grid-template-columns:1fr; }
+  .register-card { padding:22px 18px; }
+  .auth-footer { flex-direction:column; align-items:flex-start; }
+  .auth-footer .footer-links { justify-content:flex-start; }
+}
+@media(min-width:801px) and (max-height:780px) {
+  #v-login .signin-shell { min-height:0; }
+  .signin-welcome { padding-top:28px; padding-bottom:28px; }
+  .signin-orbit { width:78px; height:78px; margin-bottom:20px; }
+  .signin-orbit span { font-size:42px; }
+  .signin-points { margin-top:18px; gap:9px; }
+}
+
+
+/* Student dashboard, exam workspace and responsive assessment refinements. */
+#v-dash,#v-exam,#v-res { width:min(100% - 32px,1180px); margin:0 auto 24px; }
+.dash-welcome { display:flex; align-items:center; gap:18px; padding:24px 28px; }
+.dash-avatar { width:66px;height:66px;flex:0 0 66px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,#8b5cf6,#22d3ee);box-shadow:0 10px 28px rgba(139,92,246,.25);font:800 25px 'Bricolage Grotesque';color:white; }
+.dash-greeting { min-width:0;flex:1; }.dash-kicker { color:#67e8f9;font-size:10px;font-weight:800;letter-spacing:.18em; }.dash-greeting h2 { font-size:clamp(22px,3vw,30px);margin:3px 0; }.dash-muted { color:var(--mu);font-size:13px; }
+.dash-status { display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;font-weight:700;white-space:nowrap; }.status-dot,.exam-save-label i { width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 12px rgba(52,211,153,.7); }
+.dash-stats { grid-template-columns:repeat(3,minmax(0,1fr));margin:14px 0 18px; }.dash-stats .stat { position:relative;min-height:132px;padding:20px 22px; }.dash-stats .stat b { font-size:32px; }.dash-stat-icon { display:block;color:#a78bfa;font-size:20px;margin-bottom:8px; }
+.dash-columns { display:grid;grid-template-columns:minmax(0,1.55fr) minmax(260px,.85fr);gap:16px;align-items:start; }.dash-instructions,.dash-side { padding:clamp(20px,3vw,30px); }.dash-instructions h3,.dash-side h3 { font-size:clamp(21px,2.5vw,27px);margin:6px 0 18px; }.instruction-list { list-style:none;counter-reset:steps;padding:0;margin:0;display:grid;gap:15px; }.instruction-list li { counter-increment:steps;display:grid;grid-template-columns:34px 1fr;column-gap:12px;align-items:start; }.instruction-list li::before { content:counter(steps,decimal-leading-zero);grid-row:span 2;width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:rgba(139,92,246,.18);color:#c4b5fd;font-size:11px;font-weight:800; }.instruction-list b { font-size:14px; }.instruction-list span { color:var(--mu);font-size:13px;line-height:1.55; }.dash-actions { display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:24px;padding-top:18px;border-top:1px solid var(--line); }.dash-hint { color:var(--mu);font-size:12px; }.dash-side p { color:var(--mu);font-size:13px;line-height:1.7; }.dash-side-line { display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);font-size:12px; }.dash-side-line span { color:var(--mu); }.dash-side-line b { text-align:right; }.dash-completed { margin-top:20px;padding:16px;border-radius:16px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.22); }.dash-completed h4 { margin:0 0 8px; }.dash-completed p { margin:0 0 12px; }
+.exam-topline { display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 18px; }.exam-title { font-size:clamp(23px,3vw,32px);margin-top:4px; }.exam-fullscreen { padding:9px 14px;font-size:12px; }.hud { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px; }.hud .pill { justify-content:center;min-width:0;white-space:nowrap; }.timer-pill { color:#fbbf24;font-variant-numeric:tabular-nums; }.exam-progress-meta { display:flex;justify-content:space-between;gap:12px;margin:12px 2px 7px;color:var(--mu);font-size:12px; }.exam-card { padding:clamp(18px,3vw,32px); }.exam-card-head { display:flex;align-items:center;justify-content:space-between;gap:12px; }.exam-save-label { display:inline-flex;align-items:center;gap:7px;color:var(--mu);font-size:11px; }.q { font-size:clamp(21px,3vw,30px);line-height:1.4;margin:22px 0 24px;overflow-wrap:anywhere; }.exam-options { display:grid;gap:10px; }.exam-options .opt { margin:0;min-height:58px;align-items:center;font-size:15px;line-height:1.45; }.exam-options .opt b { width:34px;height:34px; }.exam-controls { margin-top:22px; }.exam-controls button { min-width:145px; }.exam-submit-row { display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin:16px 2px 0; }.exam-submit-row>span { color:var(--mu);font-size:12px; }.nav button { width:40px;height:40px;font-weight:700; }.exam-focus main { max-width:none!important;width:100%!important;padding:24px clamp(14px,4vw,56px)!important; }.exam-focus #site-header { display:none!important; }.exam-focus #v-exam { width:min(100%,1240px);margin:0 auto; }.exam-focus #global-copyright { display:none!important; }
+@media(max-width:850px) { .dash-columns { grid-template-columns:1fr; }.dash-side { display:grid;grid-template-columns:1fr 1fr;column-gap:22px; }.dash-side .dash-kicker,.dash-side h3,.dash-side>p { grid-column:1/-1; }.dash-side-line { align-self:end; } }
+@media(max-width:620px) { #v-dash,#v-exam,#v-res { width:calc(100% - 24px); }.dash-welcome { padding:18px;gap:12px;flex-wrap:wrap; }.dash-avatar { width:54px;height:54px;flex-basis:54px;border-radius:17px; }.dash-greeting h2 { font-size:21px; }.dash-status { margin-left:66px; }.dash-stats { grid-template-columns:1fr 1fr; }.dash-stats .stat:last-child { grid-column:1/-1;min-height:105px; }.dash-stats .stat { min-height:112px;padding:16px; }.dash-stats .stat b { font-size:27px; }.dash-side { display:block; }.exam-topline { align-items:flex-start; }.exam-fullscreen { padding:8px 10px;font-size:11px; }.hud { grid-template-columns:repeat(2,minmax(0,1fr)); }.hud .pill { font-size:12px;padding:8px 9px; }.exam-card { padding:17px 14px; }.q { margin:18px 0;font-size:21px; }.exam-options .opt { padding:12px;gap:10px;font-size:14px; }.exam-controls button { min-width:0;flex:1;padding:12px 14px; }.exam-submit-row { align-items:stretch; }.exam-submit-row .btn { width:100%; }.exam-submit-row>span { text-align:center; }.nav { gap:7px; }.nav button { width:36px;height:36px; } }
+@media(max-width:380px) { .dash-stats { grid-template-columns:1fr; }.dash-stats .stat:last-child { grid-column:auto; }.dash-status { margin-left:0; }.exam-topline { flex-direction:column; }.exam-fullscreen { align-self:flex-end; }.exam-controls button { font-size:13px; } }
+
+
+/* Exam focus warnings and fast optimistic answer feedback. */
+.exam-warning{margin:0 0 16px;padding:13px 16px;border:1px solid rgba(251,191,36,.55);border-radius:14px;background:rgba(120,75,10,.28);color:#fde68a;font-size:14px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.exam-warning[hidden]{display:none!important}
+.opt:disabled{cursor:default;opacity:.92}
+.opt.is-saving{border-color:var(--cy);box-shadow:0 0 0 2px rgba(34,211,238,.16)}
+@media(max-width:620px){.exam-warning{font-size:12px;padding:11px 12px}.exam-warning button{margin-top:8px}}
+
+</style><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script></head><body>
+<canvas id="gl" aria-hidden="true"></canvas><canvas id="bg" aria-hidden="true"></canvas><canvas id="fx" aria-hidden="true"></canvas>
+<div class="toast" id="toast" role="status"></div>
+<main>
+<header class="top" id="site-header">
+  <a class="logo" href="#home" aria-label="QUESTORA home"><i></i>QUESTORA</a>
+  <div class="top-right">
+    <nav class="landing-nav" id="landing-nav" aria-label="Main navigation">
+      <a href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <button class="nav-cta" id="nav-signin" type="button" data-go="login">Sign in</button>
+    </nav>
+    <div class="top-tools">
+      <button class="pill" id="out" style="display:none">Sign out</button>
+    </div>
+    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="landing-nav">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<section class="view on" id="v-land"><div class="hero" id="home"><div class="coinhero">Q</div><h1>Challenge your mind.<br>Earn your glory.</h1><p>Take a focused assessment, earn coins for correct answers, and see your progress clearly. Your time limit is based on the number of questions.</p><button class="btn" data-go="login">Enter the arena</button> <button class="btn ghost" data-go="reg" style="margin-left:8px">Create account</button><a class="scroll-cue" href="#features" aria-label="Scroll down to explore features"><span>SCROLL TO EXPLORE</span><i aria-hidden="true">⌄</i></a></div>
+<div class="grid landing-features" id="features">
+  <div class="glass stat"><b>+10 coins</b><span>Earn coins for every correct answer, with an extra streak reward.</span></div>
+  <div class="glass stat"><b>One focused attempt</b><span>Your question set is randomized and your answers are saved as you progress.</span></div>
+</div>
+<section class="landing-note" id="how-it-works" aria-labelledby="landing-note-title">
+  <span class="note-kicker">HOW QUESTORA WORKS</span>
+  <h2 id="landing-note-title">Prepare. Participate. Progress.</h2>
+  <p>Sign in with your student credentials, read the exam instructions, and start when you are ready. Answer one question at a time, keep an eye on your timer, and submit when you finish. Your result brings together your score, accuracy, coins, streak and subject-wise performance.</p>
+  <button class="btn" type="button" data-go="login">Get started</button>
+</section>
+
+</section>
+
+<section class="view" id="v-login">
+  <div class="signin-shell">
+    <aside class="signin-welcome">
+      <div class="signin-orbit" aria-hidden="true"><span>Q</span><i></i><b></b></div>
+      <span class="signin-kicker">WELCOME BACK</span>
+      <h1>Your next<br><em>win starts here.</em></h1>
+      <p>Step back into QUESTORA, continue your challenge, and turn what you know into progress.</p>
+      <div class="signin-points"><span><i>✦</i> One focused attempt</span><span><i>✦</i> Progress that matters</span><span><i>✦</i> Rewards for every correct answer</span></div>
+    </aside>
+    <div class="signin-card">
+      <span class="signin-kicker">STUDENT ACCESS</span>
+      <h2>Sign in to QUESTORA</h2>
+      <p class="signin-intro">Enter your details to continue your journey.</p>
+      <label for="ht">Hall Ticket Number</label>
+      <div class="signin-input-wrap"><span aria-hidden="true">▤</span><input id="ht" autocomplete="username" placeholder="Enter your hall ticket number"></div>
+      <label for="pw">Password</label>
+      <div class="signin-input-wrap"><span aria-hidden="true">⌑</span><input id="pw" type="password" autocomplete="current-password" placeholder="Enter your password"><button class="password-toggle" id="pw-toggle" type="button" aria-label="Show password">Show</button></div>
+      <div class="signin-meta"><span>Use your registered student credentials</span></div>
+      <div class="err" id="lerr" role="alert"></div>
+      <button class="btn signin-submit" id="lgn" type="button"><span>Sign in securely</span><b aria-hidden="true">→</b></button>
+      <p class="signin-register">New to QUESTORA? <button type="button" data-go="reg">Create an account</button></p>
+      <div class="signin-bottom"><span></span> YOUR CHALLENGE. YOUR MOMENT. <span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="v-reg">
+  <div class="signin-shell register-shell">
+    <aside class="signin-welcome register-welcome">
+      <div class="signin-orbit" aria-hidden="true"><span>Q</span><i></i><b></b></div>
+      <span class="signin-kicker">YOUR QUEST STARTS HERE</span>
+      <h1>Create your<br><em>next opportunity.</em></h1>
+      <p>Set up your student account to take assessments, build your score, and keep track of every achievement.</p>
+      <div class="signin-points"><span><i>✦</i> One account per Hall Ticket</span><span><i>✦</i> Your progress in one place</span><span><i>✦</i> A focused assessment experience</span></div>
+    </aside>
+    <div class="signin-card register-card">
+      <span class="signin-kicker">STUDENT REGISTRATION</span>
+      <h2>Create your account</h2>
+      <p class="signin-intro">Enter your details to get started with QUESTORA.</p>
+      <div class="register-fields">
+        <div><label for="r_f">First name</label><div class="signin-input-wrap"><span aria-hidden="true">✦</span><input id="r_f" type="text" autocomplete="given-name" placeholder="First name"></div></div>
+        <div><label for="r_l">Last name</label><div class="signin-input-wrap"><span aria-hidden="true">✦</span><input id="r_l" type="text" autocomplete="family-name" placeholder="Last name"></div></div>
+        <div><label for="r_h">Hall Ticket Number</label><div class="signin-input-wrap"><span aria-hidden="true">▤</span><input id="r_h" type="text" placeholder="Hall ticket number"></div></div>
+        <div><label for="r_e">Email</label><div class="signin-input-wrap"><span aria-hidden="true">@</span><input id="r_e" type="email" autocomplete="email" placeholder="Email address"></div></div>
+        <div><label for="r_p">Phone (10 digits)</label><div class="signin-input-wrap"><span aria-hidden="true">⌕</span><input id="r_p" type="tel" autocomplete="tel" placeholder="10-digit phone number"></div></div>
+        <div><label for="r_a">Address</label><div class="signin-input-wrap"><span aria-hidden="true">⌖</span><input id="r_a" type="text" autocomplete="street-address" placeholder="Your address"></div></div>
+        <div><label for="r_pw">Password (8+ chars)</label><div class="signin-input-wrap"><span aria-hidden="true">⌑</span><input id="r_pw" type="password" autocomplete="new-password" placeholder="Create password"></div></div>
+        <div><label for="r_pc">Confirm password</label><div class="signin-input-wrap"><span aria-hidden="true">⌑</span><input id="r_pc" type="password" autocomplete="new-password" placeholder="Confirm password"></div></div>
+      </div>
+      <label class="register-show"><input type="checkbox" id="r_show"> Show passwords</label>
+      <div class="err" id="rerr" role="alert"></div>
+      <button class="btn signin-submit" id="rgo" type="button"><span>Create account</span><b aria-hidden="true">→</b></button>
+      <p class="signin-register">Already have an account? <button type="button" data-go="login">Sign in</button></p>
+      <div class="signin-bottom"><span></span> YOUR CHALLENGE. YOUR MOMENT. <span></span></div>
+    </div>
+  </div>
+</section>
+<section class="view" id="v-dash">
+  <div class="dash-welcome glass"><div class="dash-avatar"><span id="av"></span></div><div class="dash-greeting"><span class="dash-kicker">STUDENT DASHBOARD</span><h2>Welcome back, <span id="wn"></span></h2><span class="dash-muted" id="dht"></span></div><div class="dash-status"><span class="status-dot"></span><span id="dst">Not started</span></div></div>
+  <div class="grid dash-stats">
+    <div class="glass stat"><span class="dash-stat-icon">◷</span><b id="dco">0</b><span>Coins earned</span></div>
+    <div class="glass stat"><span class="dash-stat-icon">◎</span><b id="dash-accuracy">—</b><span>Latest accuracy</span></div>
+    <div class="glass stat"><span class="dash-stat-icon">✦</span><b id="dash-best">—</b><span>Best streak</span></div>
+  </div>
+  <div class="dash-columns">
+    <section class="glass dash-instructions"><span class="dash-kicker">BEFORE YOU BEGIN</span><h3>Your exam, clearly explained</h3>
+      <ol class="instruction-list">
+        <li><b>One attempt</b><span>You have one attempt. Your selected answers are saved as you progress.</span></li>
+        <li><b>Question-based timing</b><span>You receive one minute for each question in your exam. The timer is controlled by the server.</span></li>
+        <li><b>Answer carefully</b><span>Choose an option to lock your answer. You can move between questions before submitting.</span></li>
+        <li><b>Earn rewards</b><span>Every correct answer earns 10 coins. A five-answer streak earns a bonus.</span></li>
+        <li><b>Review your result</b><span>After submission, check your score, accuracy, subject performance, coins and leaderboard position.</span></li>
+      </ol>
+      <div class="dash-actions"><button class="btn" id="start">Start examination</button><span class="dash-hint" id="dash-hint">Take a moment to read the instructions before starting.</span></div>
+    </section>
+    <aside class="glass dash-side"><span class="dash-kicker">YOUR QUEST</span><h3>Stay focused. Keep progressing.</h3><p>Your progress is saved as you answer. If you leave and return, you can resume while your exam time is still running.</p><div class="dash-side-line"><span>Time allowance</span><b>1 min / question</b></div><div class="dash-side-line"><span>Correct answer</span><b>+10 coins</b></div><div class="dash-side-line"><span>Streak reward</span><b>At 5 in a row</b></div>
+      <div class="dash-completed" id="dash-completed" hidden><h4>Latest exam summary</h4><p id="dash-summary">Your completed exam details will appear here.</p><button class="btn ghost" type="button" id="view-latest-result">View full result</button></div>
+    </aside>
+  </div>
+</section>
+
+<section class="view" id="v-exam">
+  <div class="exam-topline"><div><span class="dash-kicker">QUESTORA ASSESSMENT</span><h2 class="exam-title">Stay focused. You've got this.</h2></div><button class="btn ghost exam-fullscreen" id="exit-fullscreen" type="button">Exit full screen</button></div>
+  <div class="exam-warning" id="exam-warning" role="alert" aria-live="assertive" hidden></div>
+  <div class="hud"><span class="pill" id="hq">Question 1</span><span class="pill gold">🪙 <span id="coins">0</span></span><span class="pill">🔥 Streak <span id="streak">0</span></span><span class="pill timer-pill" id="timer">10:00</span></div>
+  <div class="exam-progress-meta"><span id="answered-count">0 answered</span><span id="remaining-count">0 remaining</span></div>
+  <div class="bar" role="progressbar" aria-label="Exam progress"><div id="prog"></div></div>
+  <div class="glass exam-card" style="margin-top:14px" id="card"><div class="exam-card-head"><div class="tag" id="cat"></div><span class="exam-save-label"><i></i> Progress saved</span></div><div class="q" id="qt"></div><div id="opts" class="exam-options"></div><div class="msg" id="msg" aria-live="polite"></div>
+    <div class="row exam-controls"><button class="btn ghost" id="prev">← Previous</button><button class="btn" id="next">Next question →</button></div><div class="nav" id="nav" aria-label="Question navigation"></div>
+  </div>
+  <div class="exam-submit-row"><span>Your answers are saved automatically. Submit when you are ready.</span><button class="btn ghost" id="sub">Submit examination</button></div>
+</section>
+
+<section class="view" id="v-res"><div class="glass"><div class="trophy" id="tr">🏆</div><h2 style="text-align:center" id="rt"></h2><div class="big" id="sc">0</div><p style="text-align:center;color:var(--mu)" id="rs"></p><div class="badges" id="bd"></div></div>
+<div class="grid" style="margin:14px 0" id="rg"></div>
+<div class="glass"><h3>Subject performance</h3><div id="subj"></div></div>
+<div class="glass" style="margin-top:14px"><h3>Leaderboard</h3><div class="wrapx"><table class="lb"><thead><tr><th>#</th><th>Student</th><th>Hall ticket</th><th>Score</th></tr></thead><tbody id="lb"></tbody></table></div><p style="color:var(--mu);font-size:14px">Ties are broken by fewer unanswered questions, then faster completion.</p></div></section>
+
+<footer class="site-footer shared-copyright" id="global-copyright"><span>© <span class="footer-year"></span> QUESTORA. All rights reserved.</span></footer>
+</main>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let sound=true,last='land';
+const CAT={QA:'Quantitative Aptitude',EM:'EAMCET · Mathematics',EP:'EAMCET · Physics',EC:'EAMCET · Chemistry'};
+const SUB={QA:'Quantitative Aptitude',EM:'Mathematics',EP:'Physics',EC:'Chemistry'};
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let S=null,attemptUsed=false,timerH,fixedEnd;
+let fullscreenExitCount=0,fullscreenWasActive=false,answerSaving=false;
+function show(id){$$('.view').forEach(v=>v.classList.remove('on'));$('#v-'+id).classList.add('on');document.body.classList.toggle('auth-view',id==='login'||id==='reg');document.body.classList.toggle('exam-focus',id==='exam');const footer=$('#global-copyright');if(footer)footer.hidden=false;window.scrollTo(0,0)}
+$$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+
+// audio
+let AC;function beep(f,d=.12,t='sine'){if(!sound)return;AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(.15,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d)}
+const chime=()=>{beep(660);setTimeout(()=>beep(880),90);setTimeout(()=>beep(1320,.2),180)};
+// particles
+const bg=$('#bg'),bx=bg.getContext('2d'),fx=$('#fx'),fc=fx.getContext('2d');let P=[],F=[];
+function rs(){bg.width=fx.width=innerWidth;bg.height=fx.height=innerHeight}rs();addEventListener('resize',rs);
+for(let i=0;i<40;i++)P.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2+.5,v:Math.random()*.25+.05});
+function loop(){bx.clearRect(0,0,bg.width,bg.height);if(!RM){bx.fillStyle='rgba(167,139,250,.5)';P.forEach(p=>{p.y-=p.v;if(p.y<0)p.y=bg.height;bx.beginPath();bx.arc(p.x,p.y,p.r,0,7);bx.fill()})}
+fc.clearRect(0,0,fx.width,fx.height);F=F.filter(p=>p.l>0);F.forEach(p=>{p.l--;p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;fc.globalAlpha=Math.min(1,p.l/20);fc.fillStyle=p.c;if(p.coin){fc.beginPath();fc.arc(p.x,p.y,p.s,0,7);fc.fill();fc.fillStyle='#b45309';fc.fillRect(p.x-1,p.y-p.s/2,2,p.s)}else fc.fillRect(p.x,p.y,p.s,p.s*.6)});fc.globalAlpha=1;requestAnimationFrame(loop)}loop();
+function burst(x,y,n,coin){if(RM)return;for(let i=0;i<n;i++){const a=Math.random()*6.28,s=Math.random()*7+2;F.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-4,g:.25,l:70+Math.random()*30,s:coin?7:6,c:coin?'#fbbf24':['#8b5cf6','#22d3ee','#fbbf24','#f0abfc'][i%4],coin})}}
+function fly(x,y){if(RM)return;const t=$('#coins').getBoundingClientRect(),tx=t.left+10,ty=t.top+10;for(let i=0;i<8;i++){const e=document.createElement('div');e.textContent='🪙';e.style.cssText=`position:fixed;left:${x}px;top:${y}px;z-index:55;font-size:22px;transition:transform .8s cubic-bezier(.5,-.3,.6,1),opacity .8s;pointer-events:none`;document.body.appendChild(e);setTimeout(()=>{e.style.transform=`translate(${tx-x+(Math.random()*20-10)}px,${ty-y}px) scale(.5)`;e.style.opacity='.2'},30+i*50);setTimeout(()=>e.remove(),1000+i*50)}}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2200)}
+function count(el,to,ms=1200){if(RM){el.textContent=to;return}const t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/ms);el.textContent=Math.round(to*k);if(k<1)requestAnimationFrame(f)})(t0)}
+// ---- live app (talks to the server; scoring and rewards are server-side) ----
+const api=async(u,b,m)=>{const r=await fetch(u,{method:m||(b?'POST':'GET'),headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed');return j};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ST={NONE:'Not started',IN_PROGRESS:'In progress',SUBMITTED:'Submitted',TIME_EXPIRED:'Time expired'};let ME=null;
+function enter(){document.body.classList.add('student-authenticated');$('#out').style.display='';$$('[data-go="login"],[data-go="reg"]').forEach(b=>b.hidden=true);const sign=$('#nav-signin');if(sign)sign.hidden=true;$('#av').textContent=(ME.first[0]+ME.last[0]).toUpperCase();$('#wn').textContent=ME.first+' '+ME.last;$('#dht').textContent='Hall Ticket '+ME.ht;$('#dco').textContent=ME.coins;$('#dst').textContent=ST[ME.status];$('#start').textContent=ME.status==='NONE'?'Start examination':ME.status==='IN_PROGRESS'?'Resume examination':'View my results';if(ME.status==='NONE'){$('#dash-accuracy').textContent='—';$('#dash-best').textContent='—';$('#dash-completed').hidden=true;}$('#dash-hint').textContent=ME.status==='IN_PROGRESS'?'Your exam is already in progress. Resume before the timer ends.':ME.status==='SUBMITTED'||ME.status==='TIME_EXPIRED'?'Your attempt is complete. Open your result summary or review your performance.':'You have one attempt. Your time allowance is one minute per question.';if(ME.status==='SUBMITTED'||ME.status==='TIME_EXPIRED')loadDashboardSummary();show('dash')}
+async function loadDashboardSummary(){try{const r=await api('/api/exam/result');$('#dash-accuracy').textContent=r.pct+'%';$('#dash-best').textContent=r.best;$('#dash-summary').textContent=`${r.correct}/${r.total} correct · ${r.pct}% accuracy · ${r.coins} coins · Rank #${r.rank}`;$('#dash-completed').hidden=false;$('#view-latest-result').onclick=()=>loadResult()}catch(e){}}
+$('#lgn').onclick=async()=>{$('#lerr').textContent='';try{await api('/api/login',{ht:$('#ht').value,password:$('#pw').value});ME=await api('/api/me');enter()}catch(e){$('#lerr').textContent=e.message}};
+const pwToggle=$('#pw-toggle');if(pwToggle)pwToggle.onclick=()=>{const field=$('#pw'),visible=field.type==='password';field.type=visible?'text':'password';pwToggle.textContent=visible?'Hide':'Show';pwToggle.setAttribute('aria-label',visible?'Hide password':'Show password')};
+$('#pw').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lgn').click()});$('#ht').addEventListener('keydown',e=>{if(e.key==='Enter')$('#pw').focus()});
+$('#out').onclick=async()=>{try{await api('/api/logout',{});ME=null;location.reload()}catch(e){toast(e.message)}};
+$('#r_show').onchange=e=>{$('#r_pw').type=$('#r_pc').type=e.target.checked?'text':'password'};
+$('#rgo').onclick=async()=>{const g=i=>$('#r_'+i).value.trim(),b={first:g('f'),last:g('l'),ht:g('h'),email:g('e'),phone:g('p'),address:g('a'),password:$('#r_pw').value,confirm:$('#r_pc').value};$('#rerr').textContent='';$('#rgo').disabled=true;
+ try{await api('/api/register',b);toast('🎉 Registered! Please sign in.');chime();$('#ht').value=b.ht;$('#pw').value='';show('login')}catch(e){$('#rerr').textContent=e.message}$('#rgo').disabled=false};
+async function requestExamFullscreen(){
+ document.body.classList.add('exam-focus');
+ if(!document.fullscreenElement&&document.documentElement.requestFullscreen){
+  try{await document.documentElement.requestFullscreen({navigationUI:'hide'});fullscreenWasActive=true;$('#exit-fullscreen').textContent='Exit full screen';}
+  catch(e){$('#exit-fullscreen').textContent='Exit focus mode';toast('Full screen is unavailable. Focus mode is still enabled.');}
+ }
+}
+function leaveExamFullscreen(){
+ if(document.fullscreenElement&&document.exitFullscreen){document.exitFullscreen().catch(()=>{});}
+ else {document.body.classList.remove('exam-focus');$('#exit-fullscreen').textContent='Return to full screen';}
+}
+$('#exit-fullscreen').onclick=()=>{
+ if(document.fullscreenElement) leaveExamFullscreen();
+ else requestExamFullscreen();
+};
+document.addEventListener('fullscreenchange',()=>{
+ const active=!!document.fullscreenElement;
+ document.body.classList.toggle('exam-focus',$('#v-exam').classList.contains('on'));
+ if(active){fullscreenWasActive=true;$('#exit-fullscreen').textContent='Exit full screen';return;}
+ $('#exit-fullscreen').textContent='Return to full screen';
+ if(fullscreenWasActive && S && !S.done && $('#v-exam').classList.contains('on')){
+  fullscreenWasActive=false;
+  fullscreenExitCount++;
+  const warning=$('#exam-warning');
+  if(fullscreenExitCount<3){
+   warning.hidden=false;
+   warning.innerHTML=`<b>Focus warning ${fullscreenExitCount} of 2:</b> You exited full-screen mode. Please return to full screen and continue your exam. If you exit again for the third time, your examination will be submitted automatically. <button class="btn ghost" id="return-fullscreen" type="button">Return to full screen</button>`;
+   $('#return-fullscreen').onclick=requestExamFullscreen;
+   toast(`Warning ${fullscreenExitCount} of 2 — please stay in full-screen mode.`);
+  }else{
+   warning.hidden=false;
+   warning.textContent='Third full-screen exit detected. Your examination is being submitted automatically.';
+   S.done=true;
+   submitNow(true);
+  }
+ }
+});
+$('#start').onclick=async()=>{if(ME.status==='SUBMITTED'||ME.status==='TIME_EXPIRED')return loadResult();await requestExamFullscreen();try{await load(ME.status==='NONE'?'/api/exam/start':'/api/exam/state')}catch(e){toast(e.message)}};
+async function load(u){const d=await api(u,u.endsWith('start')?{}:null);if(d.status!=='IN_PROGRESS')return loadResult();
+ S={qs:d.questions,n:d.questions.length,ans:d.questions.map(q=>d.answers[q.id]??null),reveal:d.reveal,coins:d.coins,streak:d.streak,done:false,end:Date.now()+d.msLeft};fullscreenExitCount=0;fullscreenWasActive=!!document.fullscreenElement;$('#exam-warning').hidden=true;document.body.classList.add('exam-focus');
+ S.i=Math.max(0,S.ans.findIndex(x=>x===null));ME.status='IN_PROGRESS';show('exam');draw();tick();clearInterval(timerH);timerH=setInterval(tick,500)}
+function tick(){const r=Math.max(0,S.end-Date.now()),el=$('#timer');el.textContent='⏱ '+String(r/60000|0).padStart(2,'0')+':'+String((r/1000|0)%60).padStart(2,'0');el.classList.toggle('warn',r<120000);if(r<=0&&!S.done){S.done=true;api('/api/exam/submit',{}).catch(()=>{}).finally(()=>loadResult())}}
+function draw(){const q=S.qs[S.i],a=S.ans[S.i],rv=S.reveal[q.id];$('#hq').textContent=`Question ${S.i+1} of ${S.n}`;$('#prog').style.width=(S.ans.filter(x=>x!==null).length/S.n*100)+'%';$('#cat').textContent=q.label;$('#qt').textContent=q.text;$('#msg').textContent='';
+ $('#opts').innerHTML=q.opts.map((o,i)=>`<button type="button" class="opt ${a!==null?(i===rv?'right':i===a?'wrong':''):''}" data-i="${i}" ${a!==null?'disabled':''}><b>${'ABCD'[i]}</b><span>${esc(o)}</span></button>`).join('');
+ $$('.opt').forEach(b=>b.onclick=()=>pick(+b.dataset.i,b));
+ $('#answered-count').textContent=S.ans.filter(x=>x!==null).length+' answered';$('#remaining-count').textContent=S.ans.filter(x=>x===null).length+' remaining';$('#nav').innerHTML=S.qs.map((_,i)=>`<button type="button" class="${S.ans[i]!==null?'done':''} ${i===S.i?'cur':''}" aria-label="Question ${i+1}${S.ans[i]!==null?', answered':''}" data-n="${i}">${i+1}</button>`).join('');
+ $$('#nav button').forEach(b=>b.onclick=()=>{S.i=+b.dataset.n;draw()});$('#prev').disabled=S.i===0;$('#next').textContent=S.i===S.n-1?'Finish':'Next';$('#coins').textContent=S.coins;$('#streak').textContent=S.streak}
+async function pick(i,btn){
+ const q=S.qs[S.i],questionIndex=S.i;
+ if(S.done||S.ans[questionIndex]!==null||answerSaving)return;
+ const r=btn.getBoundingClientRect(),x=r.left+30,y=r.top+20;
+ answerSaving=true;S.ans[questionIndex]=i;
+ draw();$('#msg').textContent='Saving your answer…';
+ const selected=$(`#opts .opt[data-i="${i}"]`);if(selected)selected.classList.add('is-saving');
+ let d;
+ try{d=await api('/api/exam/answer',{qid:q.id,chosen:i,idx:questionIndex});}
+ catch(e){S.ans[questionIndex]=null;answerSaving=false;draw();return /closed|expired/i.test(e.message)?loadResult():toast(e.message)}
+ answerSaving=false;S.reveal[q.id]=d.correctIdx;S.coins=d.coins;S.streak=d.streak;draw();
+ if(d.correct){chime();burst(x,y,50,true);fly(x,y);$('#msg').textContent=['Nailed it!','Sharp thinking!','Gold earned!'][questionIndex%3]+' Coins added.';if(d.bonus){toast('🔥 Streak bonus!');burst(innerWidth/2,innerHeight/3,120,false)}}
+ else{beep(300,.2,'triangle');$('#msg').textContent='Not this time. Keep going, you have this.'}
+}
+$('#prev').onclick=()=>{if(answerSaving)return;S.i--;draw()};$('#next').onclick=()=>{if(answerSaving)return;S.i<S.n-1?(S.i++,draw()):submitNow()};$('#sub').onclick=()=>submitNow(false);
+async function submitNow(force=false){if(!S||S.done&& !force)return;const un=S.ans.filter(x=>x===null).length;if(!force&&!confirm(un?un+' questions unanswered. Submit anyway?':'Submit your examination?'))return;S.done=true;try{await api('/api/exam/submit',{})}catch(e){}loadResult()}
+async function loadResult(){clearInterval(timerH);let d;try{d=await api('/api/exam/result')}catch(e){return toast(e.message)}
+ ME.status=d.status;$('#dst').textContent=ST[d.status];$('#dco').textContent=d.coins;$('#start').textContent='View my results';leaveExamFullscreen();$('#dash-accuracy').textContent=d.pct+'%';$('#dash-best').textContent=d.best;$('#dash-summary').textContent=`${d.correct}/${d.total} correct · ${d.pct}% accuracy · ${d.coins} coins · Rank #${d.rank}`;$('#dash-completed').hidden=false;show('res');const p=d.pct;
+ $('#tr').textContent=p>=90?'🏆':p>=70?'🥈':'🥉';$('#rt').textContent=d.status==='TIME_EXPIRED'?'Time is up. Here is your result':'Exam complete, '+ME.first+'!';count($('#sc'),d.correct);$('#rs').textContent=`out of ${d.total} · ${p}% · ${ST[d.status]} · Rank #${d.rank}`;
+ $('#bd').innerHTML=d.badges.map((b,i)=>`<span class="badge" style="animation-delay:${i*.25}s">${b}</span>`).join('');
+ $('#rg').innerHTML=[['Correct',d.correct],['Incorrect',d.incorrect],['Unanswered',d.unanswered],['Coins',d.coins],['Duration',Math.floor(d.dur/60)+'m '+d.dur%60+'s'],['Best streak',d.best]].map(x=>`<div class="glass stat"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+ $('#subj').innerHTML=d.sections.map(r=>`<div class="sub"><span>${esc(r.name)}</span><div class="bar"><div style="width:${r.n?r.c/r.n*100:0}%"></div></div><span>${r.c}/${r.n}</span></div>`).join('');
+ $('#lb').innerHTML=d.board.map((r,i)=>`<tr class="${r.me?'me':''}"><td>${['🥇','🥈','🥉'][i]||i+1}</td><td>${esc(r.name)}</td><td>${esc(r.ht)}</td><td>${r.score}</td></tr>`).join('');
+ if(p>=70){chime();for(let i=0;i<5;i++)setTimeout(()=>burst(Math.random()*innerWidth,Math.random()*innerHeight/2,70,i%2),i*350)}}
+api('/api/me').then(m=>{ME=m;enter()}).catch(()=>{});
+
+// ---- 3D world ----
+try{if(window.THREE){const T=THREE,R=new T.WebGLRenderer({canvas:$('#gl'),alpha:true,antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
+const sc=new T.Scene(),cam=new T.PerspectiveCamera(50,1,.1,100);cam.position.z=9;sc.add(new T.AmbientLight(0xffffff,.55));
+[[0xec4899,-6,4,4],[0x22d3ee,6,-3,4],[0xfbbf24,0,6,6]].forEach(([c,x,y,z])=>{const l=new T.PointLight(c,1.7,40);l.position.set(x,y,z);sc.add(l)});
+const cc=document.createElement('canvas');cc.width=cc.height=256;const g=cc.getContext('2d');g.fillStyle='#f5b50a';g.fillRect(0,0,256,256);g.strokeStyle='#fff3b0';g.lineWidth=12;g.beginPath();g.arc(128,128,102,0,7);g.stroke();g.fillStyle='#7c4a03';g.font='800 150px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('Q',128,140);
+const gold=new T.MeshStandardMaterial({color:0xfbbf24,metalness:.9,roughness:.25,emissive:0x6b4200,emissiveIntensity:.4}),face=new T.MeshStandardMaterial({map:new T.CanvasTexture(cc),metalness:.8,roughness:.3});
+const coin=new T.Mesh(new T.CylinderGeometry(1.4,1.4,.28,64),[gold,face,face]);coin.rotation.x=Math.PI/2;const grp=new T.Group();grp.add(coin);sc.add(grp);
+const cols=[0xec4899,0x22d3ee,0x8b5cf6,0xfbbf24,0x34d399,0xf97316],geos=[()=>new T.IcosahedronGeometry(.6),()=>new T.OctahedronGeometry(.7),()=>new T.TorusGeometry(.5,.18,16,40),()=>new T.TorusKnotGeometry(.4,.14,80,12),()=>new T.DodecahedronGeometry(.55)];
+const S3=[];for(let i=0;i<24;i++){const m=new T.Mesh(geos[i%5](),new T.MeshStandardMaterial({color:cols[i%6],metalness:.5,roughness:.3,flatShading:i%2==0}));m.userData={a:i/24*6.28,r:4+Math.random()*4,y:(Math.random()-.5)*7,z:-1-Math.random()*6,sp:.08+Math.random()*.15,rx:Math.random()*.02+.005,ry:Math.random()*.02+.005,ph:Math.random()*6};sc.add(m);S3.push(m)}
+const sp=new Float32Array(1200);for(let i=0;i<1200;i++)sp[i]=(Math.random()-.5)*40;const sg=new T.BufferGeometry();sg.setAttribute('position',new T.BufferAttribute(sp,3));const stars=new T.Points(sg,new T.PointsMaterial({size:.06,color:0xffffff}));sc.add(stars);
+S3.forEach(m=>sc.remove(m));S3.length=0;stars.visible=false;
+const V3=T.Vector3,Q=T.Quaternion,up=new V3(0,1,0);
+const rings=new T.Group();[[2.1,0x22d3ee],[2.6,0xec4899],[3.1,0xfbbf24]].forEach(([r,c],i)=>{const m=new T.Mesh(new T.TorusGeometry(r,.035,12,120),new T.MeshBasicMaterial({color:c}));m.rotation.x=1.15+i*.12;m.rotation.y=i*.3;rings.add(m)});grp.add(rings);
+const N=900,wp=new Float32Array(N*6),wc=new Float32Array(N*6),wd=[],pal=[[1,.6,.9],[.5,.9,1],[1,.9,.5],[.7,.6,1],[1,1,1]];
+for(let i=0;i<N;i++){const c=pal[i%5];wc.set([...c,c[0]*.15,c[1]*.15,c[2]*.15],i*6);wd.push({x:(Math.random()-.5)*50,y:(Math.random()-.5)*30,z:-Math.random()*60})}
+const wg=new T.BufferGeometry();wg.setAttribute('position',new T.BufferAttribute(wp,3));wg.setAttribute('color',new T.BufferAttribute(wc,3));
+const warp=new T.LineSegments(wg,new T.LineBasicMaterial({vertexColors:true}));warp.frustumCulled=false;sc.add(warp);let wv=.35;
+const mw=(c,e)=>new T.MeshStandardMaterial({color:c,metalness:.6,roughness:.25,emissive:e||0,emissiveIntensity:.35});
+const rk=new T.Group(),nose=new T.Mesh(new T.ConeGeometry(.22,.5,24),mw(0xec4899,0x500724)),win=new T.Mesh(new T.SphereGeometry(.11,16,16),mw(0x22d3ee,0x0e7490)),band=new T.Mesh(new T.CylinderGeometry(.265,.265,.12,24),mw(0x8b5cf6)),fl=new T.Mesh(new T.ConeGeometry(.17,.8,16),new T.MeshBasicMaterial({color:0xfbbf24,transparent:true,opacity:.9}));
+nose.position.y=.8;win.position.set(0,.2,.2);band.position.y=-.3;fl.rotation.x=Math.PI;fl.position.y=-1.05;
+for(let i=0;i<3;i++){const f=new T.Mesh(new T.BoxGeometry(.04,.45,.3),mw(0xfbbf24,0x7c2d12)),a=i*2.094;f.position.set(Math.sin(a)*.3,-.5,Math.cos(a)*.3);f.rotation.y=a;rk.add(f)}
+rk.add(new T.Mesh(new T.CylinderGeometry(.22,.26,1.1,24),mw(0xf8fafc)),nose,win,band,fl);rk.scale.setScalar(.55);sc.add(rk);
+const TR=140,tp=new Float32Array(TR*3),tc=new Float32Array(TR*3),tg=new T.BufferGeometry();for(let i=0;i<TR;i++){const f=1-i/TR;tc.set([f,f*f*.6,f*f*f*.3],i*3)}
+tg.setAttribute('position',new T.BufferAttribute(tp,3));tg.setAttribute('color',new T.BufferAttribute(tc,3));
+const trail=new T.Points(tg,new T.PointsMaterial({size:.16,vertexColors:true,transparent:true,blending:T.AdditiveBlending,depthWrite:false}));trail.frustumCulled=false;sc.add(trail);let ra=0;
+const cg=new T.ConeGeometry(.07,2.4,8);cg.translate(0,1.2,0);const CM=[];
+for(let i=0;i<4;i++){const c=new T.Group();c.add(new T.Mesh(cg,new T.MeshBasicMaterial({color:[0x67e8f9,0xf0abfc,0xfde68a,0xffffff][i],transparent:true,opacity:.8,blending:T.AdditiveBlending})),new T.Mesh(new T.SphereGeometry(.1,10,10),new T.MeshBasicMaterial({color:0xffffff})));c.visible=false;c.userData={t:Math.random()*4,on:0};sc.add(c);CM.push(c)}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b&&(b.matches('[data-go]')||b.id==='start')){wv=16;boost=Math.min(14,boost+6)}});
+// morphing particle sculpture (replaces coin + rings)
+coin.visible=false;rings.visible=false;
+const NP=3200,pp=new Float32Array(NP*3),pc=new Float32Array(NP*3),SH=[],R_=Math.random;
+const mk=f=>{const a=new Float32Array(NP*3);for(let i=0;i<NP;i++){const p=f(i);a[i*3]=p[0];a[i*3+1]=p[1];a[i*3+2]=p[2]}return a};
+SH.push(mk(i=>{const y=1-i/(NP-1)*2,r=Math.sqrt(1-y*y),th=i*2.39996;return[Math.cos(th)*r*2,y*2,Math.sin(th)*r*2]}));
+const qc=document.createElement('canvas');qc.width=qc.height=200;const qx=qc.getContext('2d');qx.fillStyle='#fff';qx.font='900 190px sans-serif';qx.textAlign='center';qx.textBaseline='middle';qx.fillText('Q',100,108);
+const qd=qx.getImageData(0,0,200,200).data,qp=[];for(let i=0;i<40000;i++)if(qd[i*4+3]>128)qp.push([i%200,(i/200)|0]);
+SH.push(mk(()=>{const p=qp[(R_()*qp.length)|0]||[100,100];return[(p[0]-100)/100*2.8,-(p[1]-100)/100*2.8,(R_()-.5)*.5]}));
+SH.push(mk(()=>{const t=R_()*6.2832;return[(Math.sin(t)+2*Math.sin(2*t))*.65+(R_()-.5)*.3,(Math.cos(t)-2*Math.cos(2*t))*.65+(R_()-.5)*.3,-Math.sin(3*t)*.65+(R_()-.5)*.3]}));
+SH.push(mk(i=>{const r=Math.pow(R_(),.7)*2.4,a=r*2.2+(i%3)*2.094+(R_()-.5)*.35;return[Math.cos(a)*r,(R_()-.5)*.3*(1-r/2.6),Math.sin(a)*r]}));
+const pal2=[0xec4899,0x22d3ee,0x8b5cf6,0xfbbf24,0xffffff].map(c=>new T.Color(c));for(let i=0;i<NP;i++){const c=pal2[(R_()*5)|0];pc.set([c.r,c.g,c.b],i*3)}pp.set(SH[0]);
+const pg=new T.BufferGeometry();pg.setAttribute('position',new T.BufferAttribute(pp,3));pg.setAttribute('color',new T.BufferAttribute(pc,3));
+const pts=new T.Points(pg,new T.PointsMaterial({size:.1,vertexColors:true,transparent:true,opacity:.95,blending:T.AdditiveBlending,depthWrite:false}));pts.frustumCulled=false;grp.add(pts);
+let mt=0,mi=0,jit=0,qf=0,rt=0,rkDone=false;rk.position.set(-12,-5,3);tp.fill(-999);
+function rz(){R.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}rz();addEventListener('resize',rz);
+let view='land',px=0,py=0,boost=0,pl=0,tm=0,lt=performance.now();addEventListener('pointermove',e=>{px=e.clientX/innerWidth-.5;py=e.clientY/innerHeight-.5});
+const tgt={land:[0,2.3,.55],login:[3.15,2.15,.43],dash:[4.2,2.2,.45],exam:[4.4,-2.7,.4],res:[0,3,.7],adm:[4.5,2.5,.35]};
+const os=show;show=id=>{os(id);view=id};const ob=burst;burst=(x,y,n,c)=>{ob(x,y,n,c);boost=Math.min(14,boost+n/8);pl=1;if(c)wv=Math.min(9,wv+2)};
+function an(now){const dt=Math.min(.05,(now-lt)/1000);lt=now;tm+=dt;const k=RM?0:1,[tx,ty,ts]=tgt[view]||tgt.land,ax=Math.min(1,cam.aspect/1.5);
+// Hide only the morphing 3D sculpture on the sign-in screen; keep the original animated background.
+grp.visible=view==='land';
+grp.position.x+=(tx*ax-grp.position.x)*.05;grp.position.y+=(ty+Math.sin(tm*1.5)*.15*k-grp.position.y)*.05;grp.scale.setScalar(grp.scale.x+(ts-grp.scale.x)*.05);
+boost*=.95;grp.rotation.y+=dt*(.9*k+boost);grp.rotation.x=Math.sin(tm)*.15*k+py*.5;
+S3.forEach(m=>{const u=m.userData;u.a+=u.sp*dt*k*(1+boost*.3);m.position.set(Math.cos(u.a)*u.r*1.3*ax-px,u.y+Math.sin(tm+u.ph)*.4*k,u.z+Math.sin(u.a)*1.5);m.rotation.x+=u.rx*(1+boost);m.rotation.y+=u.ry*(1+boost);m.scale.setScalar(1+pl*.5)});
+pl*=.92;const kk=RM?0:1;
+for(let i=0;i<N;i++){const s=wd[i];s.z+=dt*(2+wv*9)*kk;if(s.z>8.5){s.z=-60;s.x=(Math.random()-.5)*50;s.y=(Math.random()-.5)*30}const L=.15+wv*1.1*kk,j=i*6;wp[j]=wp[j+3]=s.x;wp[j+1]=wp[j+4]=s.y;wp[j+2]=s.z;wp[j+5]=s.z-L}wg.attributes.position.needsUpdate=true;wv+=(.35-wv)*.025;
+ra+=dt*(.7+boost*.12)*kk;let tgp;
+if(view==='exam'){const pr=S&&S.ans?S.ans.filter(x=>x!==null).length/10:0;tgp=new V3(5.4*ax+Math.sin(tm*2)*.1,-3.3+pr*6.4+Math.sin(tm*3)*.08,1.5)}
+else{const r=view==='land'?3.4:2.6,c=grp.position;tgp=new V3(c.x+Math.cos(ra)*r*1.4*ax,c.y+Math.sin(ra)*r*.45+Math.sin(ra*2)*.3,Math.sin(ra+1.2)*2.8)}
+const pv=rk.position.clone();if(!rkDone){rt+=dt;const u=Math.min(1,rt/6),e=u*u*(3-2*u);rk.position.set(-9*ax+e*18*ax,-5+e*9+Math.sin(e*6.28)*1.2,3-e*4);if(u>=1){rkDone=true;rk.visible=false;trail.visible=false}}const vel=rk.position.clone().sub(pv);
+if(view==='exam')rk.quaternion.slerp(new Q().setFromAxisAngle(new V3(0,0,1),-.15),.1);else if(vel.length()>1e-4)rk.quaternion.slerp(new Q().setFromUnitVectors(up,vel.normalize()),.15);
+rk.scale.setScalar(rk.scale.x+((view==='exam'?.4:.55)-rk.scale.x)*.05);fl.scale.set(1,1+Math.random()*.5+boost*.06,1);fl.position.y=-1.05-(fl.scale.y-1)*.4;
+tp.copyWithin(3,0,(TR-1)*3);const tl=rk.localToWorld(new V3(0,-1.3,0));tp[0]=tl.x;tp[1]=tl.y;tp[2]=tl.z;tg.attributes.position.needsUpdate=true;mt+=dt*kk;if(mt>5){mt=0;mi=(mi+1)%SH.length;jit=.6}if(boost>2)jit=Math.max(jit,Math.min(1,boost/8));jit*=.94;qf+=((mi===1?1:0)-qf)*.05;pts.rotation.y=-grp.rotation.y*qf;
+const tt=SH[mi];for(let i=0;i<NP*3;i++)pp[i]+=(tt[i]-pp[i])*.045+((Math.random()-.5)*.25+pp[i]*.03)*jit;pg.attributes.position.needsUpdate=true;
+CM.forEach(c=>{const u=c.userData;u.t-=dt;if(!u.on){if(u.t>0)return;u.on=1;u.l=1.6;c.position.set(6+Math.random()*6,3+Math.random()*3,-3-Math.random()*3);u.v=new V3(-11-Math.random()*5,-5-Math.random()*2,0);c.quaternion.setFromUnitVectors(up,u.v.clone().normalize().negate());c.visible=!RM}u.l-=dt;c.position.addScaledVector(u.v,dt);if(u.l<=0){u.on=0;c.visible=false;u.t=1.5+Math.random()*3.5}});cam.position.x+=(px*1.5-cam.position.x)*.04;cam.position.y+=(-py-cam.position.y)*.04;cam.lookAt(0,0,0);R.render(sc,cam);requestAnimationFrame(an)}requestAnimationFrame(an);}}catch(e){console.warn('3D disabled',e)}
+(function(){const h=$('.hero h1');if(!h)return;h.innerHTML=['Challenge your mind.','Earn your glory.'].map((l,li)=>l.split(' ').map((w,i)=>`<span style="animation-delay:${(li*3+i)*.14}s,${-(li*3+i)*1.3}s">${w}</span>`).join(' ')).join('<br>')})();
+document.addEventListener('pointermove',e=>{const c=e.target.closest&&e.target.closest('.stat');$$('.stat').forEach(x=>{if(x!==c)x.style.transform=''});if(!c||RM)return;const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform=`perspective(600px) rotateY(${x*14}deg) rotateX(${-y*14}deg) translateZ(8px)`});
+
+// Landing-page navigation behavior. Existing exam and account logic is unchanged.
+(function () {
+  const nav = document.getElementById('landing-nav');
+  const toggle = document.getElementById('menu-toggle');
+  const year = document.getElementById('footer-year');
+  const header = document.getElementById('site-header');
+  if (year) year.textContent = new Date().getFullYear();
+  document.querySelectorAll('.footer-year').forEach(function (el) { el.textContent = new Date().getFullYear(); });
+
+  // Preserve the original navbar appearance at the top; tint it gently
+  // only after the page has moved so the links remain easy to read.
+  function updateHeaderOnScroll() {
+    if (header) header.classList.toggle('scrolled', window.scrollY > 24);
+  }
+  updateHeaderOnScroll();
+  window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
+
+
+  document.querySelectorAll('.auth-footer a[href^="#"]').forEach(function (link) {
+    link.addEventListener('click', function (event) {
+      event.preventDefault();
+      const id = link.getAttribute('href').slice(1);
+      if (!document.getElementById('v-land').classList.contains('on')) show('land');
+      requestAnimationFrame(function () { const section = document.getElementById(id); if (section) section.scrollIntoView({behavior: RM ? 'auto' : 'smooth', block:'start'}); });
+    });
+  });
+
+  function closeMenu() {
+    if (!nav || !toggle) return;
+    nav.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open navigation');
+  }
+
+  if (nav && toggle) {
+    toggle.addEventListener('click', function () {
+      const opened = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(opened));
+      toggle.setAttribute('aria-label', opened ? 'Close navigation' : 'Open navigation');
+    });
+    nav.querySelectorAll('a, button').forEach(function (item) {
+      item.addEventListener('click', function (event) {
+        closeMenu();
+        const target = item.getAttribute('href');
+        if (target && target.charAt(0) === '#') {
+          event.preventDefault();
+          const id = target.slice(1);
+          if (!document.getElementById('v-land').classList.contains('on')) show('land');
+          requestAnimationFrame(function () { const section = document.getElementById(id); if (section) section.scrollIntoView({behavior: RM ? 'auto' : 'smooth', block:'start'}); });
+        }
+      });
+    });
+    document.addEventListener('click', function (event) {
+      if (!nav.contains(event.target) && !toggle.contains(event.target)) closeMenu();
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 620) closeMenu();
+    });
+  }
+})();
+
+</script></body></html>
+
+<style>
+/* Shared centered copyright footer on landing, sign-in, registration, dashboard, exam and results. */
+#global-copyright { width:min(100% - 48px,1320px); margin:26px auto 0; padding:16px 8px 10px; border-top:1px solid var(--line); display:flex; justify-content:center; align-items:center; text-align:center; color:var(--mu); font-size:12px; letter-spacing:.025em; }
+#global-copyright[hidden] { display:none !important; }
+#v-land .landing-features { grid-template-columns:repeat(2,minmax(0,1fr)); }
+#v-dash, #v-exam, #v-res { padding-bottom:8px; }
+@media(max-width:620px) { #global-copyright { width:calc(100% - 32px); margin-top:20px; padding-top:14px; } #v-land .landing-features { grid-template-columns:1fr; } }
+</style>

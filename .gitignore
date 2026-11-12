@@ -1,0 +1,8 @@
+node_modules/
+.env
+.env.local
+questora.db
+*.sqlite
+*.sqlite3
+.vercel/
+.DS_Store
